@@ -23,6 +23,7 @@ namespace HericMVC
                                                 options.UseSqlServer(Configuration.GetConnectionString("ConnectionString")));
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<ICategoriaRepository, CategoriaRepository>();
+            services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
