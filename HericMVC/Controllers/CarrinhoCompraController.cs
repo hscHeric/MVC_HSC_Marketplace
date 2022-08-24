@@ -1,6 +1,7 @@
 ﻿using HericMVC.Models;
 using HericMVC.Repositories.Interfaces;
 using HericMVC.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HericMVC.Controllers
@@ -29,6 +30,7 @@ namespace HericMVC.Controllers
             return View(carrinhoCompraVM);
         }
 
+        [Authorize]
         public IActionResult AdicionarItemNoCarrinhoCompra(int produtoId)
         {
             var produtoSelecionado = _produtoRepository.Produtos.FirstOrDefault(p => p.ProdutoId == produtoId);
@@ -40,6 +42,8 @@ namespace HericMVC.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [Authorize]
         public IActionResult RemoverItemDoCarrinhoCompra(int produtoId)
         {
             var produtoSelecionado = _produtoRepository.Produtos.FirstOrDefault(p => p.ProdutoId == produtoId);

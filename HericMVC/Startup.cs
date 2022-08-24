@@ -3,6 +3,8 @@ using HericMVC.Repositories.Interfaces;
 using HericMVC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using HericMVC.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
 
 namespace HericMVC
 {
@@ -21,6 +23,9 @@ namespace HericMVC
             services.AddControllersWithViews();
             services.AddDbContext<AppDbContext>(options => 
                                                 options.UseSqlServer(Configuration.GetConnectionString("ConnectionString")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<ICategoriaRepository, CategoriaRepository>();
             services.AddTransient<IPedidoRepository, PedidoRepository>();
@@ -51,7 +56,10 @@ namespace HericMVC
             app.UseStaticFiles();
 
             app.UseRouting();
+            
             app.UseSession();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseAuthorization();
 
