@@ -1,0 +1,13 @@
+﻿@model HomeViewModel
+
+<partial name="_Carousel" />
+
+<div class="text-center">
+    <h2>Destaques da semana</h2>
+</div>
+<div class="row">
+    @foreach (var item in Model.ProdutosPreferidos)
+    {
+        <partial name="_ProdutosResumo" for="@item" />
+    }
+</div>
