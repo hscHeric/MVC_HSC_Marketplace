@@ -4,7 +4,7 @@ using HericMVC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using HericMVC.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Builder;
+using HericMVC.Services;
 
 namespace HericMVC
 {
@@ -21,7 +21,7 @@ namespace HericMVC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddDbContext<AppDbContext>(options => 
+            services.AddDbContext<AppDbContext>(options =>
                                                 options.UseSqlServer(Configuration.GetConnectionString("ConnectionString")));
 
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
@@ -30,6 +30,15 @@ namespace HericMVC
             services.AddTransient<ICategoriaRepository, CategoriaRepository>();
             services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp));
+            services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireRole("Admin");
+                });
+            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -40,7 +49,7 @@ namespace HericMVC
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ISeedUserRoleInitial seedUserRoleInitial)
         {
             if (env.IsDevelopment())
             {
@@ -53,10 +62,16 @@ namespace HericMVC
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
+            app.UseStaticFiles();
             app.UseRouting();
             
+            //Cria os pefis
+            seedUserRoleInitial.SeedRoles();
+            //Cria os usuários e atribui aos perfis
+            seedUserRoleInitial.SeedUsers();
+
+
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -65,6 +80,12 @@ namespace HericMVC
 
             app.UseEndpoints(endpoints =>
             {
+
+                endpoints.MapControllerRoute(
+                  name: "areas",
+                  pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}"
+                );
+
                 endpoints.MapControllerRoute(
                   name: "categoriaFiltro",
                   pattern: "Produto/{action}/{categoria?}",
