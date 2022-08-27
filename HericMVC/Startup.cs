@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using HericMVC.Models;
 using Microsoft.AspNetCore.Identity;
 using HericMVC.Services;
+using ReflectionIT.Mvc.Paging;
+using NuGet.Protocol;
+using HericMVC.Areas.Admin.Servicos;
 
 namespace HericMVC
 {
@@ -31,6 +34,7 @@ namespace HericMVC
             services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp));
             services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
+            services.AddScoped<RelatorioVendasService>();
 
             services.AddAuthorization(options =>
             {
@@ -43,6 +47,12 @@ namespace HericMVC
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddControllersWithViews();
+
+            services.AddPaging(options =>
+            {
+                options.ViewName = "Bootstrap4";
+                options.PageParameterName = "pageindex";
+            });
 
             services.AddMemoryCache();
             services.AddSession();
